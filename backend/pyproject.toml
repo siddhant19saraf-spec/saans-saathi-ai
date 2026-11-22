@@ -1,0 +1,122 @@
+[build-system]
+requires = ["hatchling==1.28.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "saans-saathi-api"
+version = "0.1.0"
+description = "SAANS SAATHI AI backend API (engineering foundation)"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+license = { text = "MIT" }
+authors = [{ name = "SAANS SAATHI AI contributors" }]
+dependencies = [
+    "fastapi==0.164.0",
+    "pydantic==2.14.3",
+    "pydantic-settings==2.16.3",
+    "sqlalchemy[asyncio]==2.1.9",
+    "psycopg[binary]==3.3.9",
+    "alembic==1.20.1",
+    "httpx==0.28.1",
+    "uvicorn[standard]==0.54.0",
+    "structlog==26.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==9.2.0",
+    "pytest-asyncio==1.5.0",
+    "pytest-cov==7.1.0",
+    "ruff==0.17.5",
+    "black==26.10.1",
+    "mypy==2.4.1",
+    "bandit==1.9.4",
+    "pip-audit==2.10.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+# ---------------------------------------------------------------------------
+# Ruff (lint only; Black owns formatting)
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle
+    "W",
+    "F",     # pyflakes
+    "I",     # import sorting
+    "B",     # bugbear
+    "UP",    # pyupgrade
+    "ASYNC", # async correctness
+    "C4",    # comprehensions
+    "SIM",   # simplify
+    "S",     # bandit rules
+    "RUF",
+]
+# E501: line length is enforced by Black.
+# B008: FastAPI's Depends()/Query() defaults are the documented pattern.
+ignore = ["E501", "B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+combine-as-imports = true
+
+# ---------------------------------------------------------------------------
+# Black
+# ---------------------------------------------------------------------------
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+extend-exclude = "alembic/versions"
+
+# ---------------------------------------------------------------------------
+# MyPy
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+show_error_codes = true
+plugins = ["pydantic.mypy"]
+exclude = ["^alembic/"]
+
+[[tool.mypy.overrides]]
+module = ["alembic.*"]
+ignore_errors = true
+
+# ---------------------------------------------------------------------------
+# Pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "9.0"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-ra --strict-markers --strict-config"
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+omit = ["app/__init__.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 80
+
+# ---------------------------------------------------------------------------
+# Bandit
+# ---------------------------------------------------------------------------
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "alembic"]
