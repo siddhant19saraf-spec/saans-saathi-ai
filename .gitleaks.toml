@@ -1,0 +1,19 @@
+# Gitleaks configuration.
+#
+# The default ruleset stays enabled. The three identifiers below are public
+# product vocabulary (a browser storage key and two emission-factor registry
+# keys), not credentials. Gitleaks' generic-api-key heuristic flags them
+# because the values are long and high-entropy, so they are allowlisted by
+# exact identifier rather than by file, which keeps every other line scanned.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public storage and emission-factor identifiers (confirmed false positives)."
+regexTarget = "match"
+regexes = [
+  '''saans\.v1\.routine\.activities''',
+  '''bus_average_uk_defra_2023''',
+  '''car_petrol_l_per_100km''',
+]
