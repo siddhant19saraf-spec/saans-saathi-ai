@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress, Skeleton } from "@/components/ui/feedback";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { useIndoorChecklist } from "@/features/indoor/use-indoor";
 import { INDOOR_CATEGORIES, INDOOR_CHECKLIST, type IndoorCategory } from "@/features/indoor/schema";
 
@@ -43,9 +44,12 @@ export function IndoorView() {
               <ShieldCheck className="size-4 text-brand-700" aria-hidden="true" />
               Shelter checklist
             </CardTitle>
-            <Badge variant={completed === total ? "default" : "neutral"}>
-              {completed} of {total} complete
-            </Badge>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <StatusBadge tone="neutral">Self-reported actions, not a measurement</StatusBadge>
+              <Badge variant={completed === total ? "default" : "neutral"}>
+                {completed} of {total} complete
+              </Badge>
+            </div>
           </div>
           <p className="text-sm text-ink-muted">
             Progress is saved in this browser only. Checking an item records your own action — it is
@@ -82,17 +86,23 @@ export function IndoorView() {
         {INDOOR_CATEGORIES.map((category) => {
           const items = INDOOR_CHECKLIST.filter((item) => item.category === category.value);
           const categoryDone = items.filter((item) => checklist[item.id]).length;
+          const categoryPercent = items.length > 0 ? (categoryDone / items.length) * 100 : 0;
 
           return (
             <Card key={category.value}>
               <CardHeader>
                 <div className="flex items-center justify-between gap-2">
                   <CardTitle className="text-sm">{category.label}</CardTitle>
-                  <span className="text-[11px] font-medium text-slate-500">
-                    {categoryDone}/{items.length}
+                  <span className="text-[11px] font-medium text-ink-muted">
+                    {categoryDone}/{items.length} · {Math.round(categoryPercent)}%
                   </span>
                 </div>
                 <p className="text-xs text-ink-muted">{CATEGORY_HINTS[category.value]}</p>
+                <Progress
+                  value={categoryPercent}
+                  label={`${category.label} progress: ${categoryDone} of ${items.length} complete`}
+                  className="mt-2 h-1.5"
+                />
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">

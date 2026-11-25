@@ -86,7 +86,9 @@ export function CopilotSection() {
               ))}
             </ul>
 
-            <p className="mt-4 flex items-start gap-2 rounded-xl border border-brand-100 bg-brand-50 p-3 text-xs leading-relaxed text-brand-900">
+            <p
+              className="mt-4 flex items-start gap-2 rounded-xl border border-brand-100 bg-brand-50 p-3 text-xs leading-relaxed text-brand-900"
+            >
               <ShieldCheck className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
               Numeric fields are computed by deterministic backend services and re-validated before
               display. Prose never becomes the source of a reading.

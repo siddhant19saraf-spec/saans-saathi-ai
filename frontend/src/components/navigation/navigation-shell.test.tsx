@@ -236,7 +236,7 @@ describe("Breadcrumbs", () => {
 
     const nav = screen.getByRole("navigation", { name: "Breadcrumb" });
     expect(within(nav).getByRole("link", { name: "Home" })).toHaveAttribute("href", "/");
-    expect(within(nav).getByText("Protection")).toBeInTheDocument();
+    expect(within(nav).getByText("Personal protection")).toBeInTheDocument();
     expect(within(nav).getByText("SmartRoutine")).toHaveAttribute("aria-current", "page");
   });
 

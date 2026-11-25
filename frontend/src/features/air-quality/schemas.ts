@@ -29,7 +29,7 @@ export const stationSchema = z.object({
 export const airLocationSchema = z.object({
   requested: coordinatesSchema,
   resolved: coordinatesSchema.nullable().optional(),
-  timezone: z.string().optional(),
+  timezone: z.string().nullable().optional(),
 });
 
 export const airReadingSchema = z.object({

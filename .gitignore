@@ -60,3 +60,12 @@ desktop.ini
 *.log
 tmp/
 .cache/
+
+# ---- Local session artifacts (not part of the published project) ----
+# These files record one-off local agent sessions and an obsolete deployment
+# plan. They stay on disk for the maintainer but are not published.
+/SESSION_COMPLETE.txt
+/SESSION_SUMMARY.txt
+/FINAL_SUMMARY.txt
+/FINAL_TERMINAL_OUTPUT.txt
+/DEPLOYMENT_INSTRUCTIONS.md

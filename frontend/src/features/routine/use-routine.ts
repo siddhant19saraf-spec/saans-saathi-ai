@@ -31,5 +31,14 @@ export function useRoutineActivities() {
     [setValue],
   );
 
-  return { activities: value, add, remove, hydrated };
+  const update = useCallback(
+    (id: string, activity: RoutineActivity) => {
+      setValue((current) =>
+        current.map((item) => (item.id === id ? { ...activity, id } : item)),
+      );
+    },
+    [setValue],
+  );
+
+  return { activities: value, add, remove, update, hydrated };
 }

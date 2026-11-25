@@ -14,7 +14,7 @@ export function StandardsSection() {
         <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
             <p className="text-xs font-semibold tracking-[0.16em] text-brand-700 uppercase">
-              Standards &amp; evidence
+              Standards & evidence
             </p>
             <h2
               id="standards-heading"

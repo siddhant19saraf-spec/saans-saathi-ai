@@ -5,6 +5,7 @@ import { Info, Layers, Ruler } from "lucide-react";
 import { AnalyticsSection } from "@/components/dashboard/analytics-section";
 import { CurrentAirSection } from "@/components/dashboard/current-air-section";
 import { LocationGate } from "@/components/dashboard/location-gate";
+import { LocationSelector } from "@/components/navigation/location-selector";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/feedback";
 import { useAirCurrent } from "@/features/air-quality/api";
@@ -29,11 +30,17 @@ export function AirQualityView() {
   }
 
   if (!activeLocation) {
-    return <LocationGate />;
+    return (
+      <div className="space-y-8">
+        <LocationSelector />
+        <LocationGate />
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-9">
+      <LocationSelector />
       <CurrentAirSection location={activeLocation} state={current.state} retry={current.retry} />
       <AnalyticsSection location={activeLocation} />
 

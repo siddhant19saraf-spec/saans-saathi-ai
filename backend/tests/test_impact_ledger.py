@@ -163,7 +163,9 @@ async def test_goal_lifecycle_and_unit_validation(
             "activity_type": "walked",
             "unit": "km",
             "target_value": 100,
-            "target_date": (datetime.now(tz=UTC).date() + timedelta(days=30)).isoformat(),
+            "target_date": (
+                datetime.now(tz=UTC).date() + timedelta(days=30)
+            ).isoformat(),
         },
     )
     assert created.status_code == 201, created.text

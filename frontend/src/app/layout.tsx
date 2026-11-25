@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 
 import { SkipLink } from "@/components/layout/skip-link";
+import { MotionPreference } from "@/components/layout/motion-preference";
 
 import "./globals.css";
 
@@ -33,13 +34,14 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#047857",
+  themeColor: "#123d31",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <body className={inter.variable}>
+        <MotionPreference />
         <SkipLink />
         {children}
       </body>

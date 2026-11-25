@@ -6,10 +6,12 @@ import { cn } from "@/lib/utils";
 export function Logo({
   href = "/",
   compact = false,
+  iconOnly = false,
   className,
 }: {
   href?: string;
   compact?: boolean;
+  iconOnly?: boolean;
   className?: string;
 }) {
   return (
@@ -22,11 +24,11 @@ export function Logo({
     >
       <span
         aria-hidden="true"
-        className="inline-flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-700 to-accent-700 text-white shadow-sm"
+        className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-800 to-brand-600 text-white shadow-sm"
       >
         <Wind className="size-5" strokeWidth={2.1} />
       </span>
-      <span className="flex flex-col leading-none">
+      <span className={cn("flex flex-col leading-none", iconOnly && "sr-only")}>
         <span className="text-sm font-semibold tracking-tight text-ink">
           SAANS <span className="text-brand-700">SAATHI</span> AI
         </span>

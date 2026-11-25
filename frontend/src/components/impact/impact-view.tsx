@@ -12,7 +12,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FieldError, Input, Label, Select } from "@/components/ui/field";
 import { Separator, Skeleton } from "@/components/ui/feedback";
-import { useApiResource } from "@/features/api/resource";
+import { MetricCard } from "@/components/ui/metric-card";
+import { ResponsiveDataTable } from "@/components/ui/responsive-data-table";
+import { SectionHeader } from "@/components/ui/section-header";
+import { useApiResource, type ResourceState } from "@/features/api/resource";
 import { fetchFactors, type EmissionFactor } from "@/features/impact/api";
 import {
   IMPACT_ACTIVITY_TYPES,
@@ -70,8 +73,10 @@ export function ImpactView() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)]">
-      <div className="space-y-4">
+    <div className="space-y-6">
+      <ImpactSummary activities={activities} factors={factors.state} />
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)]">
+      <div className="min-w-0 space-y-4">
         <Card>
           <CardHeader>
             <CardTitle>Log an activity</CardTitle>
@@ -94,7 +99,6 @@ export function ImpactView() {
               className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_7rem_9rem_auto] sm:items-start"
             >
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="impact-type">Activity</Label>
                 <Select
                   id="impact-type"
                   aria-invalid={errors.type ? true : undefined}
@@ -184,7 +188,7 @@ export function ImpactView() {
         </Card>
       </div>
 
-      <div className="space-y-4">
+      <div className="min-w-0 space-y-4">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -248,7 +252,116 @@ export function ImpactView() {
           </p>
         </div>
       </div>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Units and method</CardTitle>
+          <p className="text-xs text-ink-muted">
+            Each entry is a quantity in the unit below. A CO₂e total would require the server to
+            apply a versioned factor to every entry — this browser never multiplies the two.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveDataTable caption="Impact activity types and their recorded units">
+            <thead>
+              <tr className="border-b border-line bg-surface-muted text-left">
+                <th scope="col" className="px-3 py-2 font-semibold text-ink">
+                  Activity
+                </th>
+                <th scope="col" className="px-3 py-2 font-semibold text-ink">
+                  Unit
+                </th>
+                <th scope="col" className="px-3 py-2 font-semibold text-ink">
+                  Logged
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {IMPACT_ACTIVITY_TYPES.map((type) => {
+                const entry = totals.get(type.value);
+                return (
+                  <tr key={type.value} className="border-b border-line/60 last:border-0">
+                    <td className="px-3 py-2 text-ink">{type.label}</td>
+                    <td className="px-3 py-2 text-ink-muted">{type.unit}</td>
+                    <td className="metric-value px-3 py-2 font-medium text-ink">
+                      {entry ? formatValue(entry.quantity, 2) : "—"}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </ResponsiveDataTable>
+          <p className="mt-2 text-[11px] leading-relaxed text-ink-subtle">
+            A dash means no entry of that type. Units are the quantities you entered; they are not
+            emission savings.
+          </p>
+        </CardContent>
+      </Card>
     </div>
+  );
+}
+
+function ImpactSummary({
+  activities,
+  factors,
+}: {
+  activities: ImpactActivity[];
+  factors: ResourceState<EmissionFactor[]>;
+}) {
+  const types = new Set(activities.map((activity) => activity.type));
+  const dates = activities.map((activity) => activity.occurredOn).sort();
+  const first = dates[0] ?? null;
+  const last = dates[dates.length - 1] ?? null;
+  const registryStatus =
+    factors.status === "success"
+      ? factors.data.length > 0
+        ? `${factors.data.length} factors loaded`
+        : "Registry returned no factors"
+      : factors.status === "loading" || factors.status === "idle"
+        ? "Loading registry…"
+        : "Registry unavailable";
+
+  return (
+    <section aria-labelledby="impact-summary-heading" className="space-y-3">
+      <SectionHeader
+        id="impact-summary-heading"
+        title="Impact overview"
+        description="Counts and units from your own log. No emissions are calculated in this build."
+      />
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard
+          label="Logged entries"
+          icon={Leaf}
+          value={activities.length > 0 ? activities.length : null}
+          emptyLabel="No entries yet"
+          hint="Stored in this browser"
+        />
+        <MetricCard
+          label="Activity types"
+          icon={Calculator}
+          value={types.size > 0 ? types.size : null}
+          emptyLabel="No types yet"
+          hint={`${IMPACT_ACTIVITY_TYPES.length} types available`}
+        />
+        <MetricCard
+          label="Log window"
+          icon={Info}
+          value={first && last ? `${formatDay(first)} – ${formatDay(last)}` : null}
+          emptyLabel="No dates yet"
+          hint="Earliest and latest entry dates"
+        />
+        <MetricCard
+          label="Factor registry"
+          icon={Calculator}
+          value={factors.status === "success" ? factors.data.length : null}
+          unit="factors"
+          emptyLabel={registryStatus}
+          hint="Source and version shown beside each factor"
+          tone={factors.status === "success" && factors.data.length > 0 ? "positive" : "default"}
+        />
+      </div>
+    </section>
   );
 }
 

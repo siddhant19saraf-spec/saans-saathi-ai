@@ -1,0 +1,39 @@
+# Render deployment configuration for SAANS SAATHI AI
+# FastAPI backend + Next.js frontend
+#
+# NOTE: YAML permits only ONE top-level `services:` key. A second key silently
+# overrides the first (yaml.safe_load returns only the last), which previously
+# dropped the backend web service entirely. Both services now live in one list.
+
+services:
+  # Backend service
+  - type: web
+    name: saans-saathi-api
+    env: python
+    plan: free
+    # Dependencies are declared in pyproject.toml (PEP 621, hatchling backend).
+    # There is no requirements.txt in this repository, so `pip install .`
+    # installs the project and its runtime dependencies.
+    buildCommand: pip install .
+    startCommand: uvicorn app.main:app --port $PORT --loop app.core.loop:selector_loop_factory
+    envVars:
+      # The application validates this URL against the supported schemes
+      # {"postgresql+psycopg", "postgresql+asyncpg"}. Using "postgres+psycopg"
+      # fails Settings validation at startup, so the correct scheme is
+      # "postgresql+psycopg".
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/saans_prod
+      LOG_LEVEL: INFO
+      CPCB_ENABLED: "false"
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      # CORS allowlist. Without this the API falls back to FRONTEND_URL
+      # (http://localhost:3000), so a deployed frontend on another origin is
+      # rejected with no Access-Control-Allow-Origin header. Wildcards are
+      # rejected by config validation by design.
+      ALLOWED_ORIGINS: https://saans-saathi-web.vercel.app,https://saans-saathi-api.vercel.app
+      FRONTEND_URL: https://saans-saathi-web.vercel.app
+
+  # Database service
+  - type: postgresql
+    name: db
+    plan: free
+    disk: 10

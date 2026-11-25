@@ -31,9 +31,7 @@ async def test_features_require_a_household_first(
         headers=auth_headers,
         json={"locale": "en-IN", "activity_windows": []},
     )
-    locations = await db_client.get(
-        "/api/v1/household/locations", headers=auth_headers
-    )
+    locations = await db_client.get("/api/v1/household/locations", headers=auth_headers)
     location = await db_client.post(
         "/api/v1/household/locations",
         headers=auth_headers,

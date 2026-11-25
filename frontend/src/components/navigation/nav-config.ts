@@ -27,7 +27,7 @@ export type NavGroup = {
 
 export const navGroups: NavGroup[] = [
   {
-    label: "Overview",
+    label: "Workspace",
     items: [
       {
         href: "/dashboard",
@@ -53,7 +53,7 @@ export const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: "Protection",
+    label: "Personal protection",
     items: [
       {
         href: "/family",
@@ -98,7 +98,7 @@ export const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: "Assistant",
+    label: "Assistance",
     items: [
       {
         href: "/copilot",
@@ -114,9 +114,9 @@ export const navGroups: NavGroup[] = [
 export const settingsItem: NavItem = {
   href: "/settings",
   label: "Settings",
-  description: "Location, notifications, privacy and local data.",
+  description: "Notifications, data sources, privacy, local data and accessibility.",
   icon: Settings2,
-  keywords: ["preferences", "privacy", "data", "account"],
+  keywords: ["preferences", "privacy", "data", "account", "accessibility"],
 };
 
 export const allNavItems: NavItem[] = [...navGroups.flatMap((group) => group.items), settingsItem];
@@ -138,7 +138,7 @@ export function navTrail(pathname: string): { group: string; item: NavItem } | n
     }
   }
   if (pathname === settingsItem.href) {
-    return { group: "Workspace", item: settingsItem };
+    return { group: "Preferences", item: settingsItem };
   }
   return null;
 }

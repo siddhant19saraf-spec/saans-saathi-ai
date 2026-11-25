@@ -40,7 +40,9 @@ export function HowItWorks() {
               The interface is built around one rule: the meaning of a number depends on where it
               came from and how old it is.
             </p>
-            <div className="mt-6 rounded-xl border border-brand-100 bg-brand-50/70 p-4 text-sm leading-relaxed text-brand-900">
+            <div
+              className="mt-6 rounded-xl border border-brand-100 bg-brand-50/70 p-4 text-sm leading-relaxed text-brand-900"
+            >
               The intelligence modules — household risk, routine planning, indoor estimates and the
               copilot — are wired to backend services that are not connected in this build. Their
               pages say so and keep local planning available. Air quality is connected through

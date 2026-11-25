@@ -1,0 +1,1 @@
+web: uvicorn app.main:app --port $PORT --loop app.core.loop:selector_loop_factory

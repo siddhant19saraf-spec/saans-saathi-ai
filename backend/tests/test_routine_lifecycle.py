@@ -74,7 +74,7 @@ async def _prepare_plan(
 ) -> tuple[dict[str, object], str]:
     await _household(client, headers)
     await _member(client, headers)
-    activity = await _activity(client, headers)
+    await _activity(client, headers)
     app.state.air_provider = provider(
         forecast=forecast(start=_local_midnight(), hours=48)
     )
@@ -337,9 +337,7 @@ async def test_plan_read_history_replan_and_manual_change(
     routine_id = str(plan["id"])
     activity_id = str(plan["blocks"][0]["activity_id"])
 
-    by_id = await db_client.get(
-        f"/api/v1/routines/{routine_id}", headers=auth_headers
-    )
+    by_id = await db_client.get(f"/api/v1/routines/{routine_id}", headers=auth_headers)
     assert by_id.status_code == 200
     assert by_id.json()["data"]["id"] == plan["id"]
 
@@ -426,9 +424,7 @@ async def test_plan_read_history_replan_and_manual_change(
         "Evening walk"
     ]
 
-    remaining = await db_client.get(
-        "/api/v1/routines/activities", headers=auth_headers
-    )
+    remaining = await db_client.get("/api/v1/routines/activities", headers=auth_headers)
     assert [item["title"] for item in remaining.json()["data"]["items"]] == [
         "Evening walk"
     ]

@@ -16,9 +16,9 @@ describe("nav-config", () => {
   });
 
   it("builds a breadcrumb trail for groups and settings only", () => {
-    expect(navTrail("/smart-routine")?.group).toBe("Protection");
+    expect(navTrail("/smart-routine")?.group).toBe("Personal protection");
     expect(navTrail("/smart-routine/2026-11-21")?.item.label).toBe("SmartRoutine");
-    expect(navTrail("/settings")).toEqual({ group: "Workspace", item: settingsItem });
+    expect(navTrail("/settings")).toEqual({ group: "Preferences", item: settingsItem });
     expect(navTrail("/settings/profile")).toBeNull();
     expect(navTrail("/nope")).toBeNull();
   });

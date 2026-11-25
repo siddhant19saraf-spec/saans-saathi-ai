@@ -19,9 +19,9 @@ const statusByHref: Record<
   "/copilot": { label: "Needs AI service", variant: "warning" },
 };
 
-export function ModulesSection() {
-  const modules = allNavItems.filter((item) => item.href !== settingsItem.href);
+const moduleItems = allNavItems.filter((item) => item.href !== settingsItem.href);
 
+export function ModulesSection() {
   return (
     <section
       id="modules"
@@ -34,15 +34,15 @@ export function ModulesSection() {
           id="modules-heading"
           className="mt-2 max-w-3xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl"
         >
-          One workspace, nine connected surfaces
+          One workspace, seven connected surfaces
         </h2>
         <p className="mt-3 max-w-2xl text-base leading-relaxed text-ink-muted">
-          Every module is reachable from the sidebar and each states whether it works locally or is
+          Every module is reachable from the sidebar. Each states whether it works locally or is
           waiting for a connected service.
         </p>
 
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {modules.map((item) => {
+          {moduleItems.map((item) => {
             const Icon = item.icon;
             const status = statusByHref[item.href] ?? {
               label: "Workspace",

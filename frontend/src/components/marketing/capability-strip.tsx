@@ -1,11 +1,11 @@
-import { Accessibility, Database, MapPin, ScanSearch } from "lucide-react";
+import { Accessibility, Database, MapPin, ShieldCheck } from "lucide-react";
 
 const items = [
   {
-    icon: ScanSearch,
-    title: "CPCB 2014 AQI",
+    icon: ShieldCheck,
+    title: "No fabricated readings",
     description:
-      "The national AQI is computed and labelled as CPCB. Other provider scales are kept separate.",
+      "Every surface shows loading, stale, error or unavailable — never sample values.",
   },
   {
     icon: Database,

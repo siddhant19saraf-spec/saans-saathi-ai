@@ -1,16 +1,15 @@
-import { AqiDial } from "@/components/air-quality/aqi-dial";
-import { SeverityBadge } from "@/components/air-quality/severity-badge";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { pollutantMeta } from "@/features/air-quality/severity";
-
 /**
  * A static preview of the dashboard. It deliberately renders empty values and
  * an explicit preview state so the landing page never implies live data.
  */
+import { AqiDial } from "@/components/air-quality/aqi-dial";
+import { SeverityBadge } from "@/components/air-quality/severity-badge";
+import { pollutantMeta } from "@/features/air-quality/severity";
+import { Card } from "@/components/ui/card";
+
 export function InterfacePreview() {
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden h-full">
       <div className="flex items-center justify-between gap-3 border-b border-line bg-slate-50/70 px-4 py-3">
         <div className="flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-slate-300" aria-hidden="true" />
@@ -22,19 +21,19 @@ export function InterfacePreview() {
         </p>
       </div>
 
-      <div className="grid gap-4 p-4 sm:grid-cols-[auto_1fr] sm:p-5">
-        <div className="flex flex-col items-center justify-center">
+      <div className="grid gap-4 p-4 sm:grid-cols-[auto_1fr] sm:p-5 h-full">
+        <div className="flex flex-col items-center justify-center h-full">
           <AqiDial value={null} category={null} />
           <SeverityBadge category={null} className="mt-2" />
         </div>
 
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="neutral">No location selected</Badge>
-            <Badge variant="outline">Model-based data</Badge>
+        <div className="min-w-0 h-full">
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <p className="mt-4 text-sm text-ink-muted">No location selected</p>
+            <p className="mt-2 text-xs font-medium text-brand-700">Model-based data</p>
           </div>
 
-          <dl className="mt-3 grid grid-cols-3 gap-2">
+          <dl className="mt-6 grid grid-cols-3 gap-2">
             {pollutantMeta.slice(0, 6).map((pollutant) => (
               <div
                 key={pollutant.key}
@@ -49,7 +48,9 @@ export function InterfacePreview() {
             ))}
           </dl>
 
-          <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+          <div
+            className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2"
+          >
             <p className="text-[11px] leading-relaxed text-amber-950">
               This panel shows layout only. In the product, readings carry their provider, source
               type, observation time and freshness; model output and ground-station observations are

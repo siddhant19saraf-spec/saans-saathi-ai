@@ -46,6 +46,7 @@ export function EcoRouteView() {
   const { activeLocation, hydrated: locationsHydrated } = useLocations();
   const [request, setRequest] = useState<EcoRouteRequest | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [tripLabels, setTripLabels] = useState<{ origin: string; destination: string } | null>(null);
 
   const preferenceForm = useForm<EcoPreferencesFormValues>({
     resolver: zodResolver(ecoPreferencesFormSchema),
@@ -112,7 +113,7 @@ export function EcoRouteView() {
                   control={preferenceForm.control}
                   name="modes"
                   render={({ field }) => (
-                    <div className="mt-2 grid grid-cols-2 gap-2">
+                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
                       {TRAVEL_MODES.map((mode) => {
                         const checked = field.value.includes(mode.value);
                         return (
@@ -248,6 +249,10 @@ export function EcoRouteView() {
                   return;
                 }
                 setFormError(null);
+                setTripLabels({
+                  origin: activeLocation?.label ?? "Origin",
+                  destination: values.label,
+                });
                 setRequest({
                   origin,
                   destination: {
@@ -276,7 +281,7 @@ export function EcoRouteView() {
                 </FieldError>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="destination-latitude">Latitude</Label>
                   <Input
@@ -355,7 +360,9 @@ export function EcoRouteView() {
                 </div>
               }
             >
-              {(comparison) => <ComparisonResult comparison={comparison} />}
+              {(comparison) => (
+                <ComparisonResult comparison={comparison} labels={tripLabels} />
+              )}
             </DataState>
           </CardContent>
         </Card>
@@ -364,19 +371,76 @@ export function EcoRouteView() {
   );
 }
 
-function ComparisonResult({ comparison }: { comparison: EcoRouteComparison }) {
+function ComparisonResult({
+  comparison,
+  labels,
+}: {
+  comparison: EcoRouteComparison;
+  labels: { origin: string; destination: string } | null;
+}) {
+  const carbonModes = comparison.modes
+    .filter((mode) => mode.recommended_for.includes("carbon"))
+    .map((mode) => MODE_LABELS.get(mode.mode as TravelMode) ?? mode.mode);
+  const exposureModes = comparison.modes
+    .filter((mode) => mode.recommended_for.includes("air"))
+    .map((mode) => MODE_LABELS.get(mode.mode as TravelMode) ?? mode.mode);
+  const fastestModes = comparison.modes
+    .filter((mode) => mode.recommended_for.includes("time"))
+    .map((mode) => MODE_LABELS.get(mode.mode as TravelMode) ?? mode.mode);
+
   return (
     <div className="space-y-4">
+      {labels ? (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-line bg-surface-muted px-3 py-2.5 text-sm">
+          <MapPin className="size-4 shrink-0 text-brand-700" aria-hidden="true" />
+          <span className="font-medium text-ink">{labels.origin}</span>
+          <ArrowRight className="size-3.5 text-ink-subtle" aria-hidden="true" />
+          <span className="font-medium text-ink">{labels.destination}</span>
+          <Badge variant="outline" className="ml-auto">
+            {comparison.route.is_estimate ? "Estimated route" : "Provider route"}
+          </Badge>
+        </div>
+      ) : null}
+
       <div className="flex flex-wrap items-center gap-2 text-sm">
         <Badge variant="neutral">{comparison.route.distance_km.toFixed(1)} km</Badge>
         <Badge variant="neutral">
           <Clock className="size-3" aria-hidden="true" />
           {comparison.route.duration_min.toFixed(0)} min
         </Badge>
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-ink-subtle">
           {comparison.route.is_estimate ? "Estimated by" : "Routing via"} {comparison.route.source}
         </span>
       </div>
+
+      {carbonModes.length > 0 || exposureModes.length > 0 || fastestModes.length > 0 ? (
+        <div className="grid gap-2 sm:grid-cols-3">
+          <div className="rounded-xl border border-brand-100 bg-brand-50/60 px-3 py-2.5">
+            <p className="text-[10px] font-semibold tracking-wide text-brand-800 uppercase">
+              Lower carbon
+            </p>
+            <p className="mt-0.5 text-sm font-medium text-ink">
+              {carbonModes.length > 0 ? carbonModes.join(", ") : "Not ranked"}
+            </p>
+          </div>
+          <div className="rounded-xl border border-line bg-surface-muted px-3 py-2.5">
+            <p className="text-[10px] font-semibold tracking-wide text-ink-subtle uppercase">
+              Lower exposure
+            </p>
+            <p className="mt-0.5 text-sm font-medium text-ink">
+              {exposureModes.length > 0 ? exposureModes.join(", ") : "Not ranked"}
+            </p>
+          </div>
+          <div className="rounded-xl border border-line bg-surface-muted px-3 py-2.5">
+            <p className="text-[10px] font-semibold tracking-wide text-ink-subtle uppercase">
+              Faster
+            </p>
+            <p className="mt-0.5 text-sm font-medium text-ink">
+              {fastestModes.length > 0 ? fastestModes.join(", ") : "Not ranked"}
+            </p>
+          </div>
+        </div>
+      ) : null}
 
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">

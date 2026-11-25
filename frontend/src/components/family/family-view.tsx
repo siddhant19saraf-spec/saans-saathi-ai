@@ -76,18 +76,26 @@ export function FamilyView() {
 
   if (!session) {
     return (
-      <SessionGate
-        busy={starting}
-        onStart={async (healthConsent) => {
-          setStarting(true);
-          const message = await startSession(healthConsent);
-          setStarting(false);
-          if (!message) {
-            setNotice("Anonymous session started. Create the household profile below.");
-          }
-          return message;
-        }}
-      />
+      <div className="space-y-6">
+        <FamilySteps
+          hasSession={false}
+          hasProfile={false}
+          hasPreferences={false}
+          hasBatch={false}
+        />
+        <SessionGate
+          busy={starting}
+          onStart={async (healthConsent) => {
+            setStarting(true);
+            const message = await startSession(healthConsent);
+            setStarting(false);
+            if (!message) {
+              setNotice("Anonymous session started. Create the household profile below.");
+            }
+            return message;
+          }}
+        />
+      </div>
     );
   }
 
@@ -130,6 +138,13 @@ export function FamilyView() {
 
   return (
     <div className="space-y-6">
+      <FamilySteps
+        hasSession
+        hasProfile={Boolean(profile)}
+        hasPreferences={Boolean(preferences)}
+        hasBatch={Boolean(batch)}
+      />
+
       {notice ? (
         <Alert variant="success">
           <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
@@ -506,6 +521,94 @@ export function FamilyView() {
         </section>
       ) : null}
     </div>
+  );
+}
+
+function FamilySteps({
+  hasSession,
+  hasProfile,
+  hasPreferences,
+  hasBatch,
+}: {
+  hasSession: boolean;
+  hasProfile: boolean;
+  hasPreferences: boolean;
+  hasBatch: boolean;
+}) {
+  const steps = [
+    {
+      label: "Session",
+      description: "Anonymous token, no account",
+      done: hasSession,
+    },
+    {
+      label: "Household",
+      description: "Anonymous profile and members",
+      done: hasProfile,
+    },
+    {
+      label: "Preferences",
+      description: "Activity windows and transport",
+      done: hasPreferences,
+    },
+    {
+      label: "Recommendations",
+      description: "Generate and review guidance",
+      done: hasBatch,
+    },
+  ];
+  const currentIndex = steps.findIndex((step) => !step.done);
+
+  return (
+    <nav aria-label="Family intelligence steps">
+      <ol className="grid gap-2 sm:grid-cols-4">
+        {steps.map((step, index) => {
+          const current = index === currentIndex;
+          return (
+            <li
+              key={step.label}
+              aria-current={current ? "step" : undefined}
+              className={
+                step.done
+                  ? "rounded-xl border border-brand-200 bg-brand-50/70 px-3 py-2.5"
+                  : current
+                    ? "rounded-xl border border-brand-300 bg-white px-3 py-2.5 ring-1 ring-brand-200"
+                    : "rounded-xl border border-line bg-white px-3 py-2.5"
+              }
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  aria-hidden="true"
+                  className={
+                    step.done
+                      ? "inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-brand-700 text-[11px] font-semibold text-white"
+                      : current
+                        ? "inline-flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-brand-700 text-[11px] font-semibold text-brand-800"
+                        : "inline-flex size-5 shrink-0 items-center justify-center rounded-full border border-line text-[11px] font-semibold text-ink-subtle"
+                  }
+                >
+                  {step.done ? <CheckCircle2 className="size-3.5" /> : index + 1}
+                </span>
+                <p
+                  className={
+                    step.done || current
+                      ? "text-sm font-semibold text-ink"
+                      : "text-sm font-medium text-ink-muted"
+                  }
+                >
+                  {step.label}
+                </p>
+                {step.done ? <span className="sr-only">complete</span> : null}
+                {current ? <span className="sr-only">current step</span> : null}
+              </div>
+              <p className="mt-1 pl-7 text-[11px] leading-relaxed text-ink-muted">
+                {step.description}
+              </p>
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
   );
 }
 

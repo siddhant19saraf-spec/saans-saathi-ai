@@ -1,4 +1,4 @@
-import { Clock3, FlaskConical, Users } from "lucide-react";
+import { Clock3, Users, FlaskConical } from "lucide-react";
 
 const problems = [
   {

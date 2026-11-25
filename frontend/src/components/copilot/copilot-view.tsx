@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FieldError, Textarea } from "@/components/ui/field";
 import { Separator, Skeleton } from "@/components/ui/feedback";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { classifyApiFailure, type ApiFailure } from "@/features/api/resource";
 import { postCopilotChat } from "@/features/copilot/api";
 import {
@@ -117,6 +118,10 @@ export function CopilotView() {
             Answers are produced by the Copilot service from its own fact pack. If the service is
             not connected, no answer is generated here.
           </p>
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            <StatusBadge tone="info">AI answers are labelled</StatusBadge>
+            <StatusBadge tone="neutral">Fallback answers say so</StatusBadge>
+          </div>
         </CardHeader>
 
         <CardContent className="flex flex-1 flex-col gap-4">
@@ -210,6 +215,12 @@ export function CopilotView() {
               The model API key is held by the server only. Nothing on this page calls the model
               directly.
             </p>
+            <p className="rounded-lg border border-line bg-surface-muted px-2.5 py-2 text-xs">
+              <span className="font-semibold text-ink">Two answer modes.</span> When the model is
+              available, the answer is labelled AI-generated. When it is not, the deterministic
+              rules engine composes the answer and the card says so — it is never presented as a
+              Gemini response. If the Copilot service itself is unreachable, no answer is invented.
+            </p>
           </CardContent>
         </Card>
 
@@ -295,12 +306,26 @@ function AnswerCard({ answer }: { answer: CopilotAnswer }) {
         <Badge variant={severityVariant(answer.severity)}>
           {answer.severity ? titleCase(answer.severity) : "Context"}
         </Badge>
-        <span className="text-[11px] text-slate-500">
-          {answer.source === "ai" ? "AI-generated, grounded" : titleCase(answer.source)}
-          {answer.model ? ` · ${answer.model}` : ""}
-          {answer.latency_ms !== null ? ` · ${formatValue(answer.latency_ms)} ms` : ""}
+        {answer.source === "ai" ? (
+          <StatusBadge tone="info">AI-generated, grounded</StatusBadge>
+        ) : answer.source === "fallback" ? (
+          <StatusBadge tone="warning">Deterministic fallback</StatusBadge>
+        ) : (
+          <StatusBadge tone="neutral">Deterministic rules answer</StatusBadge>
+        )}
+        <span className="text-[11px] text-ink-subtle">
+          {answer.model ? `${answer.model} · ` : ""}
+          {answer.latency_ms !== null ? `${formatValue(answer.latency_ms)} ms` : ""}
         </span>
       </div>
+
+      {answer.source !== "ai" ? (
+        <p className="mt-2 rounded-lg border border-line bg-surface-muted px-2.5 py-1.5 text-[11px] leading-relaxed text-ink-muted">
+          {answer.source === "fallback"
+            ? "The language model was unavailable, so this answer was composed by the deterministic rules engine from the cited facts. It is not a Gemini response."
+            : "This answer was composed by the deterministic rules engine from the cited facts. It is not a language model response."}
+        </p>
+      ) : null}
 
       <p className="mt-2 text-sm leading-relaxed whitespace-pre-line text-ink">{answer.answer}</p>
 

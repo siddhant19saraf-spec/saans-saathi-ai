@@ -2,14 +2,13 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable
+from types import SimpleNamespace
 
 import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient
 from pydantic import SecretStr
 from sqlalchemy import func, select
-
-from types import SimpleNamespace
 
 from app.domain.facts import FactPack
 from app.integrations.ai.gemini import GeminiOutput
@@ -130,16 +129,12 @@ async def test_fact_pack_excludes_names_coordinates_and_free_text(
         return []
 
     monkeypatch.setattr(family_service, "get_profile", fake_get_profile)
-    monkeypatch.setattr(
-        family_service, "list_recommendations", fake_recommendations
-    )
+    monkeypatch.setattr(family_service, "list_recommendations", fake_recommendations)
     monkeypatch.setattr(routine_service, "get", fake_routine)
     monkeypatch.setattr(impact_service, "summary", fake_summary)
     monkeypatch.setattr(impact_service, "baseline_and_savings", fake_savings)
     monkeypatch.setattr(impact_service, "list_goals", fake_goals)
-    monkeypatch.setattr(
-        indoor_shield_service, "list_assessments", fake_assessments
-    )
+    monkeypatch.setattr(indoor_shield_service, "list_assessments", fake_assessments)
     monkeypatch.setattr(ecoroute_service, "list_journeys", fake_journeys)
 
     pack = await _build_fact_pack(

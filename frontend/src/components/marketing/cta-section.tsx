@@ -7,7 +7,7 @@ export function CtaSection() {
   return (
     <section aria-labelledby="cta-heading" className="bg-canvas">
       <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-900 via-brand-800 to-accent-800 px-6 py-12 text-white shadow-raised sm:px-10 sm:py-14">
+        <div className="relative overflow-hidden rounded-3xl bg-canvas p-6 text-white shadow-raised sm:px-10 sm:py-14">
           <div aria-hidden="true" className="surface-grid absolute inset-0 opacity-20" />
           <div className="relative max-w-2xl">
             <p className="flex items-center gap-2 text-xs font-semibold tracking-[0.16em] text-brand-200 uppercase">
@@ -17,7 +17,7 @@ export function CtaSection() {
             <h2 id="cta-heading" className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
               Build the habit of checking the air before the plan.
             </h2>
-            <p className="mt-3 text-base leading-relaxed text-brand-50/90">
+            <p className="mt-3 text-base leading-relaxed text-white/90">
               Open the dashboard, save a place, and see exactly what is connected — and what is
               still waiting for a data service.
             </p>

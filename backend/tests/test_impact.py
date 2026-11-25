@@ -21,7 +21,13 @@ async def test_factors_expose_provenance(client: AsyncClient) -> None:
     # Base factors + bus + train DEFRA-2023 factors
     assert len(factors) == 5
     keys = {factor["key"] for factor in factors}
-    assert {"petrol_combustion", "diesel_combustion", "grid_india_cea_v22", "bus_average_uk_defra_2023", "train_national_rail_uk_defra_2023"} <= keys
+    assert {
+        "petrol_combustion",
+        "diesel_combustion",
+        "grid_india_cea_v22",
+        "bus_average_uk_defra_2023",
+        "train_national_rail_uk_defra_2023",
+    } <= keys
     for factor in factors:
         assert factor["source_url"].startswith("https://")
         assert factor["version"]

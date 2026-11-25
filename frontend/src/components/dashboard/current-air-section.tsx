@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, CloudOff } from "lucide-react";
+import { AlertCircle, CloudOff, Clock3 } from "lucide-react";
 
 import { AqiDial } from "@/components/air-quality/aqi-dial";
 import { SeverityBadge } from "@/components/air-quality/severity-badge";
@@ -9,11 +9,12 @@ import { DataState } from "@/components/shared/data-state";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatusBadge } from "@/components/ui/status-badge";
 import type { ResourceState } from "@/features/api/resource";
 import type { AirCurrent } from "@/features/air-quality/schemas";
 import { pollutantMeta, severityMeta } from "@/features/air-quality/severity";
 import { formatCoordinates, type SavedLocation } from "@/features/locations/schema";
-import { formatValue } from "@/lib/format";
+import { formatDateTime, formatValue } from "@/lib/format";
 
 import { PollutantGrid } from "./pollutant-grid";
 import { ProvenancePanel } from "./provenance-panel";
@@ -28,14 +29,18 @@ export function CurrentAirSection({
   retry: () => void;
 }) {
   return (
-    <section aria-labelledby="current-heading" className="space-y-4">
+    <section aria-label="Current conditions" className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 id="current-heading" className="text-lg font-semibold text-ink">
+          <p className="mb-1.5 flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] text-brand-700 uppercase">
+            <span aria-hidden="true" className="h-px w-5 bg-brand-300" />
             Current conditions
+          </p>
+          <h2 id="current-heading" className="text-lg font-semibold tracking-tight text-ink">
+            {location.label}
           </h2>
           <p className="mt-0.5 text-sm text-ink-muted">
-            {location.label} · {formatCoordinates(location.lat, location.lon)}
+            {formatCoordinates(location.lat, location.lon)}
           </p>
         </div>
         <Badge variant="neutral">CPCB 2014 National AQI</Badge>
@@ -70,6 +75,7 @@ function CurrentAirContent({ data, location }: { data: AirCurrent; location: Sav
     const value = data.reading[pollutant.key];
     return value === null || value === undefined ? [] : [{ label: pollutant.label, value }];
   });
+  const reportedCount = comparison.length;
 
   const providerValues = [
     { label: "US AQI", value: data.provider_aqi?.us ?? null },
@@ -78,36 +84,47 @@ function CurrentAirContent({ data, location }: { data: AirCurrent; location: Sav
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex flex-wrap items-center gap-2">
-            CPCB Air Quality Index
+      <Card className="overflow-hidden">
+        <CardHeader className="border-b border-line/70 pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CardTitle>CPCB Air Quality Index</CardTitle>
             {sourceLabel ? <Badge variant="outline">{sourceLabel}</Badge> : null}
-          </CardTitle>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusBadge tone={data.provenance.stale ? "stale" : "positive"}>
+              {data.provenance.stale
+                ? `Stale · ${formatValue(data.provenance.age_minutes)} min old`
+                : `Fresh · ${formatValue(data.provenance.age_minutes)} min old`}
+            </StatusBadge>
+            <span className="inline-flex items-center gap-1 text-[11px] text-ink-subtle">
+              <Clock3 className="size-3" aria-hidden="true" />
+              Fetched {formatDateTime(data.provenance.fetched_at)}
+            </span>
+          </div>
         </CardHeader>
-        <CardContent className="flex flex-col items-center gap-3">
+        <CardContent className="flex flex-col items-center gap-3 pt-5">
           <AqiDial value={aqi?.value ?? null} category={category} partial={aqi?.partial ?? false} />
           <SeverityBadge category={category} showRange />
 
-          {meta ? <p className="text-center text-sm text-ink-muted">{meta.summary}</p> : null}
+          {meta ? <p className="text-center text-sm leading-relaxed text-ink-muted">{meta.summary}</p> : null}
 
           {aqi ? (
             <div className="w-full space-y-2">
-              <dl className="flex flex-wrap items-center justify-center gap-2 text-xs">
-                <div className="rounded-lg border border-line bg-slate-50 px-2.5 py-1.5">
-                  <dt className="text-slate-500">Dominant pollutant</dt>
-                  <dd className="font-semibold text-ink">{aqi.dominant_pollutant}</dd>
+              <dl className="grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded-lg border border-line bg-surface-muted px-2.5 py-2">
+                  <dt className="text-ink-subtle">Dominant pollutant</dt>
+                  <dd className="mt-0.5 font-semibold text-ink">{aqi.dominant_pollutant}</dd>
                 </div>
-                <div className="rounded-lg border border-line bg-slate-50 px-2.5 py-1.5">
-                  <dt className="text-slate-500">Method</dt>
-                  <dd className="font-semibold text-ink">{aqi.method}</dd>
+                <div className="rounded-lg border border-line bg-surface-muted px-2.5 py-2">
+                  <dt className="text-ink-subtle">Method</dt>
+                  <dd className="mt-0.5 font-semibold text-ink">{aqi.method}</dd>
                 </div>
               </dl>
-              <p className="text-center text-[11px] leading-relaxed text-slate-500">
+              <p className="text-center text-[11px] leading-relaxed text-ink-subtle">
                 Coverage: {aqi.coverage.length > 0 ? aqi.coverage.join(", ") : "none reported"}
               </p>
               {aqi.basis ? (
-                <p className="text-center text-[11px] leading-relaxed text-slate-500">
+                <p className="text-center text-[11px] leading-relaxed text-ink-subtle">
                   Basis: {aqi.basis}
                 </p>
               ) : null}
@@ -138,16 +155,23 @@ function CurrentAirContent({ data, location }: { data: AirCurrent; location: Sav
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Pollutant concentrations</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="border-b border-line/70 pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CardTitle>Pollutant concentrations</CardTitle>
+            <Badge variant="neutral">
+              {reportedCount} of {pollutantMeta.length} reported
+            </Badge>
+          </div>
+          <p className="text-sm text-ink-muted">
+            Latest reported values in the units shown. Missing pollutants stay missing.
+          </p>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 pt-4">
           <PollutantGrid reading={data.reading} />
           <p className="text-xs leading-relaxed text-ink-muted">
-            Latest reported values in the units shown, with observation time and source listed
-            below. A dash means the provider did not report that pollutant — SAANS SAATHI does not
-            fill gaps with estimates.
+            Observation time and source are listed below. A dash means the provider did not report
+            that pollutant — SAANS SAATHI does not fill gaps with estimates.
           </p>
         </CardContent>
       </Card>
